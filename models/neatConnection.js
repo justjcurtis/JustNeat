@@ -10,10 +10,6 @@ class Connection {
         this.innov = innov
     }
 
-    static Equal(a, b) {
-        return a.innov == b.innov
-    }
-
     static FromJson(json) {
         const data = JSON.parse(json)
         return new Connection(data.inNode, data.outNode, data.weight, data.innov, data.recurrent, data.enabled)

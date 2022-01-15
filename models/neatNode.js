@@ -10,10 +10,6 @@ class Node {
         this.activation = type == NodeType.hidden ? aNm.tanh : aNm.id
     }
 
-    static Equal(a, b) {
-        return a.id == b.id
-    }
-
     static FromJson(json) {
         const data = JSON.parse(json)
         const n = new Node(data.id, data.type, data.bias)
