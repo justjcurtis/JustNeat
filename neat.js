@@ -29,8 +29,8 @@ const defaultHyper = {
     complexityThreshold: 30,
     complexityFloorDelay: 10,
     fitnessPlatauThreshold: 10,
-    connectionCost: 1,
-    nodeCost: 2
+    connectionCost: 0.1,
+    nodeCost: 0.2
 
 }
 
