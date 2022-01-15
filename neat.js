@@ -28,7 +28,10 @@ const defaultHyper = {
     cloneRate: 0.25,
     complexityThreshold: 30,
     complexityFloorDelay: 10,
-    fitnessPlatauThreshold: 10
+    fitnessPlatauThreshold: 10,
+    connectionCost: 1,
+    nodeCost: 2
+
 }
 
 const defaultProbs = {
@@ -430,7 +433,7 @@ class Neat {
 
         species = Object.values(species)
         for (let i = 0; i < species.length; i++) {
-            species[i].sort((a, b) => b.score - a.score)
+            species[i].sort((a, b) => (b.score - b.genomeCost) - (a.score - a.genomeCost))
             for (let j = 0; j < species[i].length; j++) {
                 species[i][j].genome.species = i
             }
@@ -514,8 +517,17 @@ class Neat {
         }
     }
 
+    populateGenomeCosts() {
+        if (this.hyper.connectionCost == 0 && this.hyper.nodeCost == 0) return
+        for (let i = 0; i < this.pop.length; i++) {
+            const client = this.pop[i]
+            client.genomeCost = (client.genome.connections.length * this.hyper.connectionCost) + (client.genome.nodes.length * this.hyper.nodeCost)
+        }
+    }
+
     evolve() {
-        this.pop.sort((a, b) => b.score - a.score)
+        this.pop.sort((a, b) => (b.score - b.genomeCost) - (a.score - a.genomeCost))
+        this.populateGenomeCosts()
         let species = this.speciate()
         const elite = this.pop.slice(0, Math.ceil(this.pop.length * this.hyper.elitism)).map(c => new Client(c.genome.copy()))
         if (species.length > this.hyper.speciesTarget) this.hyper.threshold++;

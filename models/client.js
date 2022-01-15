@@ -4,6 +4,7 @@ class Client {
     constructor(genome) {
         this.genome = genome
         this.score = -Infinity
+        this.genomeCost = 0
     }
 
     getInputValue(node, graph) {
