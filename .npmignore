@@ -1,0 +1,5 @@
+browserNeat.min.js
+rollup.config.js
+manualTest/**
+node_modules/**
+.vscode/**
