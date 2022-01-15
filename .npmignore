@@ -3,3 +3,5 @@ rollup.config.js
 manualTest/**
 node_modules/**
 .vscode/**
+*.test.js
+*.testData.js
