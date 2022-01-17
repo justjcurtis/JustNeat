@@ -62,14 +62,14 @@ class Genome {
     }
 
     getLongestPathToInput(nodeId, graph, visited = {}) {
-        visited[nodeId] = true
         if (graph[nodeId].node.type == NodeType.input) return 0
         const parents = graph[nodeId].parents
         if (parents.length == 0) return undefined
         const lengths = []
         for (let i = 0; i < parents.length; i++) {
-            if (visited[parents[i].inNode] || parents[i].recurrent) continue
-            lengths.push(this.getLongestPathToInput(parents[i].inNode, graph, visited) + 1)
+            if (visited[parents[i].id] || parents[i].recurrent) continue
+            visited[parents[i].id] = true
+            lengths.push(this.getLongestPathToInput(parents[i].inNode, graph, {...visited }) + 1)
         }
         return Math.max(...lengths)
     }
@@ -90,8 +90,9 @@ class Genome {
                 continue
             }
             const l = this.getLongestPathToInput(this.nodes[i].id, graph)
-            if (layerMap[l] == undefined) layerMap[l] = []
             this.nodes[i].layer = l
+            if (l < 0) continue
+            if (layerMap[l] == undefined) layerMap[l] = []
             layerMap[l].push(this.nodes[i])
         }
         const maxLayer = Object.keys(layerMap).length + 1
