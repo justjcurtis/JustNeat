@@ -149,7 +149,6 @@ describe('neatGenome', () => {
                 genome.buildGenomeMap()
             }
             graph = genome.getGraph()
-            console.log(genome.connectionMap)
             const postCheck = genome.getLongestPathToInput(nodeId, graph)
             expect(postCheck).toBe(post)
         })
@@ -225,7 +224,121 @@ describe('neatGenome', () => {
         })
     })
     describe("simplifications", () => {
-        // TODO: add tests
+        let randomVal = 0.5
+        const random = Math.random
+        beforeAll(() => {
+            global.Math.random = () => randomVal
+        })
+        afterAll(() => {
+            global.Math.random = random
+        })
+        const getMockMutationGenome = () => {
+            const genome = getXorGenome()
+            genome.mutateActivation = jest.fn()
+            genome.mutateBiasRandom = jest.fn()
+            genome.mutateBiasShift = jest.fn()
+            genome.mutateConnection = jest.fn()
+            genome.mutateDeleteConnection = jest.fn()
+            genome.mutateDeleteNode = jest.fn()
+            genome.mutateDisableConnection = jest.fn()
+            genome.mutateInterpose = jest.fn()
+            genome.mutateWeightRandom = jest.fn()
+            genome.mutateWeightShift = jest.fn()
+            return genome
+        }
+        const getNeat = () => ({
+            probs: {
+                weightMutationChance: 0,
+                weightShiftChance: 0,
+                biasMutationChance: 0,
+                biasShiftChance: 0,
+                addConnectionChance: 0,
+                addRecurrentChance: 0,
+                reEnableConnectionChance: 0,
+                disableConnectionChance: 0,
+                addNodeChance: 0,
+                deleteConnectionChance: 0,
+                deleteNodeChance: 0,
+                randomActivationChance: 0,
+            }
+        })
+        test('simplify should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
+            const neat = getNeat()
+            const genome = getMockMutationGenome()
+            genome.simplify(neat)
+            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+            neat.probs.deleteConnectionChance = 1
+            genome.simplify(neat)
+            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(1)
+            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+        })
+
+        test('simplify should call mutateDeleteNode when Math.random() < addNodeChance', () => {
+            const neat = getNeat()
+            const genome = getMockMutationGenome()
+            genome.simplify(neat)
+            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+            neat.probs.addNodeChance = 1
+            genome.simplify(neat)
+            expect(genome.mutateDeleteNode.mock.calls.length).toBe(1)
+            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+        })
+
+        describe('deleteConnection', () => {
+            test('should delete the connection with the same id & rebuild maps', () => {
+                const genome = getXorGenome()
+                const conId = genome.connections[4].id
+                genome.deleteConnection(conId)
+                let found = false
+                for (let i = 0; i < genome.connections; i++) {
+                    if (genome.connections[i].id == conId) {
+                        found = true
+                        break
+                    }
+                }
+                expect(found).toBe(false)
+                expect(genome.connectionMap[conId]).toBe(undefined)
+            })
+        })
+
+        describe('deleteNode', () => {
+            test('should delete the node with the same id & rebuild maps', () => {
+                const genome = getXorGenome()
+                const nodeId = genome.nodes[4].id
+                genome.deleteNode(nodeId)
+                let found = false
+                for (let i = 0; i < genome.nodes; i++) {
+                    if (genome.nodes[i].id == nodeId) {
+                        found = true
+                        break
+                    }
+                }
+                expect(found).toBe(false)
+                expect(genome.nodeMap[nodeId]).toBe(undefined)
+            })
+        })
+
+        describe('mutateDeleteConnection', () => {
+            test('mutateDeleteConnection should delete the connection and hidden nodes with no other connections on the same side', () => {
+                const genome = getXorGenome()
+                let i = 0
+                let limit = genome.connections.length
+                while (genome.connections.length > 0) {
+                    if (i >= limit) break
+                    const preIds = Object.keys(genome.connectionMap)
+                    genome.mutateDeleteConnection()
+                    const postIds = Object.keys(genome.connectionMap)
+                    expect(preIds.length > postIds.length).toBe(true)
+                    i++
+                }
+                expect(genome.connections.length).toBe(0)
+                expect(genome.nodes.length).toBe(3)
+                expect(genome.nodes.filter(n => n.type != Node.hidden).length).toBe(genome.nodes.length)
+
+            })
+        })
     })
     describe("augmentations", () => {
         // TODO: add tests
