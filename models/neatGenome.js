@@ -115,7 +115,7 @@ class Genome {
 
     simplify(neat) {
         if (this.connections.length < 1) return
-        if (Math.random() < neat.probs.disableConnectionChance) this.mutateDeleteConnection()
+        if (Math.random() < neat.probs.deleteConnectionChance) this.mutateDeleteConnection()
         if (Math.random() < neat.probs.addNodeChance) this.mutateDeleteNode(neat)
         this.mutate(neat)
     }
