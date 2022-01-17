@@ -61,4 +61,27 @@ describe('neatConnection', () => {
             expect(copy.enabled).not.toBe(con.enabled)
         })
     })
+    describe('toJson', () => {
+        test.each(getConnections())('given a connection .toJson() a json string with all the data of the connection', (con) => {
+            const data = JSON.parse(con.toJson())
+            expect(data.inNode).toBe(con.inNode)
+            expect(data.outNode).toBe(con.outNode)
+            expect(data.weight).toBe(con.weight)
+            expect(data.innov).toBe(con.innov)
+            expect(data.recurrent).toBe(con.recurrent)
+            expect(data.enabled).toBe(con.enabled)
+        })
+    })
+    describe('FromJson', () => {
+        test.each(getConnections())('Connection.FromJson(con.toJson()) should return a copy of the connection', (con) => {
+            const json = con.toJson()
+            const newCon = Connection.FromJson(json)
+            expect(newCon.inNode).toBe(con.inNode)
+            expect(newCon.outNode).toBe(con.outNode)
+            expect(newCon.weight).toBe(con.weight)
+            expect(newCon.innov).toBe(con.innov)
+            expect(newCon.recurrent).toBe(con.recurrent)
+            expect(newCon.enabled).toBe(con.enabled)
+        })
+    })
 })
