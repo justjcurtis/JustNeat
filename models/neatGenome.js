@@ -273,7 +273,9 @@ class Genome {
     }
 
     mutateDisableConnection() {
-        const con = getRandomElement(this.connections)
+        const enabledConnections = this.connections.filter(c => c.enabled)
+        if (enabledConnections.length == 0) return
+        const con = getRandomElement(enabledConnections)
         con.enabled = false
         this.g = null
         this.constructLayers()
