@@ -1,6 +1,8 @@
 const Genome = require('./neatGenome')
 const Node = require('./neatNode')
 const Connection = require('./neatConnection')
+const Client = require('./client')
+const Neat = require('../neat')
 const NodeType = require('./nodeType')
 
 describe('neatGenome', () => {
@@ -29,6 +31,25 @@ describe('neatGenome', () => {
         const genome = getXorGenome()
         genome.connections.push(new Connection(2, 3, 24, 6, true))
         return genome
+    }
+    const getRealNeat = (genome) => {
+        const inputCount = genome.nodes.filter(n => n.type == NodeType.input)
+        const outputCount = genome.nodes.filter(n => n.type == NodeType.output)
+        const neat = new Neat(inputCount, outputCount)
+        neat.pop = [new Client(genome)]
+        neat.connectionPool = {}
+        neat.currentConnections = 0
+        neat.nodePool = []
+        neat.mandatoryNodes = []
+        for (let i = 0; i < genome.nodes.length; i++) {
+            neat.nodePool.push(genome.nodes[i].copy())
+            neat.mandatoryNodes.push(genome.nodes[i].copy())
+        }
+        for (let i = 0; i < genome.connections.length; i++) {
+            neat.connectionPool[genome.connections[i].id] = genome.connections[i].innov
+            neat.currentConnections++
+        }
+        return neat
     }
     const recurrentNonRecurrentTestData = [
         ['non-recurrent', false],
@@ -263,9 +284,8 @@ describe('neatGenome', () => {
             }
         })
         test('simplify should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
-            const neat = getNeat()
             const genome = getMockMutationGenome()
-            genome.simplify(neat)
+            const neat = getNeat(genome)
             expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
             expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
             neat.probs.deleteConnectionChance = 1
@@ -339,7 +359,63 @@ describe('neatGenome', () => {
 
             })
         })
+        describe('mutateDeleteNode', () => {
+            const mutateDeleteNodeTestData = [
+                [getXorGenome()],
+                [(function() {
+                    const genome = getXorGenome()
+                    genome.deleteConnection('1,3')
+                    genome.deleteConnection('1,4')
+                    genome.nodes.push(new Node(5, NodeType.output, 10))
+                    genome.connections.push(new Connection(3, 5, Math.random(), 5))
+                    genome.connections.push(new Connection(4, 5, Math.random(), 6))
+                    genome.buildGenomeMap()
+                    genome.constructLayers()
+                    return genome
+                }())]
+            ]
+            test.each(mutateDeleteNodeTestData)('mutateDeleteNode should delete a hidden node with either only 1 input or output replace the connections with 1', (genome) => {
+                const neat = getRealNeat(genome)
+                const preNotHidden = genome.nodes.filter(n => n.type != NodeType.hidden).length
+                const preHidden = genome.nodes.filter(n => n.type == NodeType.hidden)
+                const postConnectionIds = {}
+                const graph = genome.getGraph()
+                for (let i = 0; i < preHidden.length; i++) {
+                    const cons = {...genome.connectionMap }
+                    const parents = graph[preHidden[i].id].parents
+                    const children = graph[preHidden[i].id].children
+                    if (parents.length == 1) {
+                        for (let j = 0; j < children.length; j++) {
+                            cons[`${parents[0].inNode},${children[j].outNode}`] = -1
+                            delete cons[children[j].id]
+                        }
+                        delete cons[parents[0].id]
+                    }
+                    if (children.length == 1) {
+                        for (let j = 0; j < parents.length; j++) {
+                            cons[`${parents[j].inNode},${children[0].outNode}`] = -1
+                            delete cons[parents[j].id]
+                        }
+                        delete cons[children[0].id]
+                    }
+                    postConnectionIds[preHidden[i].id] = cons
+                }
+                const preNodes = Object.keys(genome.nodeMap).length
+                const preConnections = Object.keys(genome.connectionMap).length
+                genome.mutateDeleteNode(neat)
+                const postNotHidden = genome.nodes.filter(n => n.type != NodeType.hidden).length
+                const postHidden = genome.nodes.filter(n => n.type == NodeType.hidden)
+                const postNodes = Object.keys(genome.nodeMap).length
+                const postConnections = Object.keys(genome.connectionMap).length
+                expect(preNodes > postNodes).toBe(true)
+                expect(preConnections > postConnections).toBe(true)
+                expect(preNotHidden).toBe(postNotHidden)
+                const missingNodeId = preHidden.filter(n => !postHidden.includes(n))[0].id
+                expect(Object.keys(genome.connectionMap).join(' ')).toBe(Object.keys(postConnectionIds[missingNodeId]).join(' '))
+            })
+        })
     })
+
     describe("augmentations", () => {
         // TODO: add tests
     })
