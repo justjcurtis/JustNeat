@@ -266,7 +266,7 @@ class Neat {
         }
         const w = weight == undefined ? randomRange(this.hyper.minWeight, this.hyper.maxWeight) : weight
         const innov = this.getInnovationId(inNode.id, outNode.id)
-        const connection = new Connection(inNode.id, outNode.id, w, innov)
+        const connection = new Connection(inNode.id, outNode.id, w, innov, inNode.layer > outNode.layer)
         genome.connectionMap[connection.id] = genome.connections.length
         genome.connections.push(connection)
         return true
