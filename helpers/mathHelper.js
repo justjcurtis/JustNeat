@@ -8,9 +8,9 @@ const gaussianRand = (n = 6) => {
 
 const randomStd0 = () => (gaussianRand() - 0.5) * 2
 
-const randomRange = (min, max) => min + (Math.random() * (max - min + 1))
+const randomRange = (min, max) => min + (Math.random() * (max - min))
 
-const randomInt = (min, max) => Math.floor(randomRange(min, max))
+const randomInt = (min, max) => Math.floor(randomRange(min, max + 1))
 
 const sigmoid = x => 1 / (1 + Math.exp(-x))
 
