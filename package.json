@@ -5,7 +5,8 @@
     "main": "neat.js",
     "scripts": {
         "build": "rollup -c",
-        "test": "jest"
+        "test": "jest",
+        "longtest": "jest --testMatch=**/*.longtest.js"
     },
     "repository": {
         "type": "git",
