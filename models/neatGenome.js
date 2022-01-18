@@ -132,12 +132,12 @@ class Genome {
         if (Math.random() < neat.probs.randomActivationChance) this.mutateActivation(neat.allowedActivations)
         if (Math.random() < neat.probs.biasMutationChance) {
             if (Math.random() < neat.probs.biasShiftChance) this.mutateBiasShift(neat.hyper.biasShiftStrength)
-            else this.mutateBiasRandom(neat)
+            else this.mutateBiasRandom(neat.hyper.minBias, neat.hyper.maxBias)
         }
         if (this.connections.length < 1) return
         if (Math.random() < neat.probs.weightMutationChance) {
             if (Math.random() < neat.probs.weightShiftChance) this.mutateWeightShift(neat.hyper.weightShiftStrength)
-            else this.mutateWeightRandom(neat)
+            else this.mutateWeightRandom(neat.hyper.minWeight, neat.hyper.maxWeight)
         }
     }
 
@@ -228,13 +228,13 @@ class Genome {
 
     mutateBiasShift(x = 0.3) {
         const n = getRandomElement(this.nodes)
-        n.bias *= randomStd0() * x
+        n.bias += randomStd0() * x
         this.g = null
     }
 
-    mutateBiasRandom(neat) {
+    mutateBiasRandom(min, max) {
         const n = getRandomElement(this.nodes)
-        n.bias = randomRange(neat.hyper.minBias, neat.hyper.maxBias)
+        n.bias = randomRange(min, max)
         this.g = null
     }
 
@@ -262,13 +262,13 @@ class Genome {
 
     mutateWeightShift(x = 0.3) {
         const con = getRandomElement(this.connections)
-        con.weight *= randomStd0() * x
+        con.weight += randomStd0() * x
         this.g = null
     }
 
-    mutateWeightRandom(neat) {
+    mutateWeightRandom(min, max) {
         const con = getRandomElement(this.connections)
-        con.weight = randomRange(neat.hyper.minWeight, neat.hyper.maxWeight)
+        con.weight = randomRange(min, max)
         this.g = null
     }
 

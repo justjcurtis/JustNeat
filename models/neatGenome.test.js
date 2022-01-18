@@ -4,6 +4,7 @@ const Connection = require('./neatConnection')
 const Client = require('./client')
 const Neat = require('../neat')
 const NodeType = require('./nodeType')
+const { aNm } = require('../helpers/activationHelper')
 
 describe('neatGenome', () => {
     const getNodes = () => [
@@ -422,7 +423,6 @@ describe('neatGenome', () => {
             })
         })
     })
-
     describe("augmentations", () => {
         let randomVal = 0.5
         const random = Math.random
@@ -584,15 +584,261 @@ describe('neatGenome', () => {
         })
     })
     describe("mutations", () => {
-        // TODO: add tests
+        let randomVal = 0.5
+        const random = Math.random
+        afterEach(() => {
+            global.Math.random = random
+        })
+        const getMockMutationGenome = () => {
+            const genome = getXorGenome()
+            genome.mutateActivation = jest.fn()
+            genome.mutateBiasRandom = jest.fn()
+            genome.mutateBiasShift = jest.fn()
+            genome.mutateConnection = jest.fn()
+            genome.mutateDeleteConnection = jest.fn()
+            genome.mutateDeleteNode = jest.fn()
+            genome.mutateDisableConnection = jest.fn()
+            genome.mutateInterpose = jest.fn()
+            genome.mutateWeightRandom = jest.fn()
+            genome.mutateWeightShift = jest.fn()
+            return genome
+        }
+        const getNeat = () => ({
+            probs: {
+                weightMutationChance: 0,
+                weightShiftChance: 0,
+                biasMutationChance: 0,
+                biasShiftChance: 0,
+                addConnectionChance: 0,
+                addRecurrentChance: 0,
+                reEnableConnectionChance: 0,
+                disableConnectionChance: 0,
+                addNodeChance: 0,
+                deleteConnectionChance: 0,
+                deleteNodeChance: 0,
+                randomActivationChance: 0,
+            },
+            hyper: {
+                weightShiftStrength: 0.2,
+                biasShiftStrength: 0.2,
+            }
+        })
+        describe('mutate', () => {
+            test('should call mutateActivation when Math.random() < randomActivationChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+                neat.probs.randomActivationChance = 1
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(1)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+            })
+            test('should call mutateBiasShift when Math.random() < biasMutationChance & biasShiftChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+                neat.probs.biasMutationChance = 1
+                neat.probs.biasShiftChance = 1
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(1)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+            })
+            test('should call mutateBiasShift when Math.random() < biasMutationChance & Math.random()> biasShiftChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+                neat.probs.biasMutationChance = 1
+                neat.probs.biasShiftChance = 0
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(1)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+            })
+            test('should call mutateBiasShift when Math.random() < weightMutationChance & weightShiftChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+                neat.probs.weightMutationChance = 1
+                neat.probs.weightShiftChance = 1
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(1)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+            })
+            test('should call mutateBiasShift when Math.random() < weightMutationChance & Math.random()> weightShiftChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
+                neat.probs.weightMutationChance = 1
+                neat.probs.weightShiftChance = 0
+                genome.mutate(neat)
+                expect(genome.mutateActivation.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasShift.mock.calls.length).toBe(0)
+                expect(genome.mutateBiasRandom.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
+                expect(genome.mutateWeightRandom.mock.calls.length).toBe(1)
+            })
+        })
+        describe('mutateActivation', () => {
+            test('should mutate a random nodes activation function to a random allowed activation function', () => {
+                const genome = getXorGenome()
+                const allowed = ['sig']
+                const preMutatedNodesCount = genome.nodes.filter(n => n.activation == aNm['sig']).length
+                genome.mutateActivation(allowed)
+                const postMutatedNodesCount = genome.nodes.filter(n => n.activation == aNm['sig']).length
+                expect(preMutatedNodesCount + 1).toBe(postMutatedNodesCount)
+            })
+        })
+        describe('mutateBiasShift', () => {
+            test('should "shift" random nodes bias by random amnt, within shift strength amnt', () => {
+                const genome = getXorGenome()
+                for (let i = 0; i < 100; i++) {
+                    const preBiases = genome.nodes.map(n => n.bias)
+                    genome.mutateBiasShift(0.3)
+                    const postBiases = genome.nodes.map(n => n.bias)
+                    let shiftCount = 0
+                    for (let j = 0; j < preBiases.length; j++) {
+                        if (preBiases[j] != postBiases[j]) {
+                            shiftCount++
+                            const diff = Math.abs(preBiases[j] - postBiases[j])
+                            expect(diff <= 0.3).toBe(true)
+                        }
+                    }
+                    expect(shiftCount).toBe(1)
+                }
+            })
+        })
+        describe('mutateBiasRandom', () => {
+            test('should set random nodes bias to random value within min & max', () => {
+                const genome = getXorGenome()
+                for (let i = 0; i < 100; i++) {
+                    const preBiases = genome.nodes.map(n => n.bias)
+                    genome.mutateBiasRandom(-100, 100)
+                    const postBiases = genome.nodes.map(n => n.bias)
+                    let shiftCount = 0
+                    for (let j = 0; j < preBiases.length; j++) {
+                        if (preBiases[j] != postBiases[j]) {
+                            shiftCount++
+                            expect(postBiases[j] >= -100 && postBiases[j] <= 100).toBe(true)
+                        }
+                    }
+                    expect(shiftCount).toBe(1)
+                }
+            })
+
+        })
+        describe('mutateWeightShift', () => {
+            test('should "shift" random connections weight by random amnt, within shift strength amnt', () => {
+                const genome = getXorGenome()
+                for (let i = 0; i < 100; i++) {
+                    const preWeights = genome.connections.map(c => c.weight)
+                    genome.mutateWeightShift(0.3)
+                    const postWeights = genome.connections.map(c => c.weight)
+                    let shiftCount = 0
+                    for (let j = 0; j < preWeights.length; j++) {
+                        if (preWeights[j] != postWeights[j]) {
+                            shiftCount++
+                            const diff = Math.abs(preWeights[j] - postWeights[j])
+                            expect(diff <= 0.3).toBe(true)
+                        }
+                    }
+                    expect(shiftCount).toBe(1)
+                }
+            })
+        })
+        describe('mutateWeightRandom', () => {
+            test('should set random connections weight by random amnt within min & max', () => {
+                const genome = getXorGenome()
+                for (let i = 0; i < 100; i++) {
+                    const preWeights = genome.connections.map(c => c.weight)
+                    genome.mutateWeightRandom(-100, 100)
+                    const postWeights = genome.connections.map(c => c.weight)
+                    let shiftCount = 0
+                    for (let j = 0; j < preWeights.length; j++) {
+                        if (preWeights[j] != postWeights[j]) {
+                            shiftCount++
+                            expect(postWeights[j] >= -100 && postWeights[j] <= 100).toBe(true)
+                        }
+                    }
+                    expect(shiftCount).toBe(1)
+                }
+            })
+        })
     })
     describe("copy", () => {
-        // TODO: add tests
+        test('should return a de-referenced replica of the genome', () => {
+            const genome = getXorGenome()
+            genome.species = 5
+            const copy = genome.copy()
+            expect(copy.nodes.map(n => n.toJson()).join(' ')).toBe(genome.nodes.map(n => n.toJson()).join(' '))
+            expect(copy.connections.map(c => c.toJson()).join(' ')).toBe(genome.connections.map(c => c.toJson()).join(' '))
+            expect(JSON.stringify(copy.connectionMap)).toBe(JSON.stringify(genome.connectionMap))
+            expect(JSON.stringify(copy.nodeMap)).toBe(JSON.stringify(genome.nodeMap))
+            expect(copy.species).toBe(genome.species)
+            expect(JSON.stringify(copy.layers)).toBe(JSON.stringify(genome.layers))
+        })
     })
     describe("toJson", () => {
-        // TODO: add tests
+        test('should return json copy of all genome nodes & connections + species', () => {
+            const genome = getXorGenome()
+            genome.species = 5
+            const data = JSON.parse(genome.toJson())
+            expect(data.nodes.map(n => Node.FromJson(n).toJson()).join(' ')).toBe(genome.nodes.map(n => n.toJson()).join(' '))
+            expect(data.connections.map(c => Connection.FromJson(c).toJson()).join(' ')).toBe(genome.connections.map(c => c.toJson()).join(' '))
+            expect(data.species).toBe(genome.species)
+        })
     })
     describe("FromJson", () => {
-        // TODO: add tests
+        test('should return a new Genome with all properties from json', () => {
+            const genome = getXorGenome()
+            genome.species = 5
+            const newGenome = Genome.FromJson(genome.toJson())
+            expect(newGenome.nodes.map(n => n.toJson()).join(' ')).toBe(genome.nodes.map(n => n.toJson()).join(' '))
+            expect(newGenome.connections.map(c => c.toJson()).join(' ')).toBe(genome.connections.map(c => c.toJson()).join(' '))
+            expect(JSON.stringify(newGenome.connectionMap)).toBe(JSON.stringify(genome.connectionMap))
+            expect(JSON.stringify(newGenome.nodeMap)).toBe(JSON.stringify(genome.nodeMap))
+            expect(newGenome.species).toBe(genome.species)
+            expect(JSON.stringify(newGenome.layers)).toBe(JSON.stringify(genome.layers))
+        })
     })
 })
