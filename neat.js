@@ -575,7 +575,7 @@ class Neat {
         return best
     }
 
-    trainFn(getScore, goal, targetLoss = 0.01, log = true) {
+    trainFn(getScore, goal, targetLoss = 0.01, log = false) {
         let best = -Infinity
         let gen = 0
         while (true) {
