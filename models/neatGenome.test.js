@@ -533,6 +533,7 @@ describe('neatGenome', () => {
                 let hasRecurrent = false
                 for (let i = 0; i < genome.connections.length; i++) {
                     const con = genome.connections[i]
+                    expect(genome.connectionMap[con.id]).toBe(i)
                     expect(seenConnections[con.id]).toBe(undefined)
                     seenConnections[con.id] = true
                     const inNode = genome.nodes[genome.nodeMap[con.inNode]]
@@ -546,10 +547,40 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateInterpose', () => {
-            // TODO: add tests
+            test('should add a node along a connection and update genome correctly', () => {
+                const genome = getXorGenome()
+                const neat = getRealNeat(genome)
+                for (let i = 0; i < 10; i++) {
+                    const preNodeCount = genome.nodes.length
+                    const preConnectionCount = genome.connections.length
+                    genome.mutateInterpose(neat)
+                    const postNodeCount = genome.nodes.length
+                    const postConnectionCount = genome.connections.length
+                    expect(preNodeCount + 1).toBe(postNodeCount)
+                    expect(preConnectionCount + 2).toBe(postConnectionCount)
+                    for (let i = 0; i < genome.connections.length; i++) {
+                        const con = genome.connections[i]
+                        const inNode = genome.nodes[genome.nodeMap[con.inNode]]
+                        const outNode = genome.nodes[genome.nodeMap[con.outNode]]
+                        if (inNode.layer == outNode.layer) expect(con.enabled).toBe(false)
+                        if (inNode.layer > outNode.layer) expect(con.recurrent).toBe(true)
+                        if (inNode.layer > outNode.layer) expect(con.enabled).toBe(false)
+                    }
+                }
+            })
         })
         describe('mutateDisableConnection', () => {
-            // TODO: add tests
+            test('should disable random connection', () => {
+                const genome = getXorGenome()
+                for (let i = 0; i < genome.connections.length; i++) {
+                    const preDisabled = genome.connections.filter(c => !c.enabled).length
+                    genome.mutateDisableConnection()
+                    const postDisabled = genome.connections.filter(c => !c.enabled).length
+                    expect(preDisabled + 1).toBe(postDisabled)
+                }
+                const enabledConnectionsCount = genome.connections.filter(c => c.enabled).length
+                expect(enabledConnectionsCount).toBe(0)
+            })
         })
     })
     describe("mutations", () => {
