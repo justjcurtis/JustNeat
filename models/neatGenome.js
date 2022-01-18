@@ -190,7 +190,7 @@ class Genome {
         if (hiddenNodes.length < 1) return
         for (let i = 0; i < 20; i++) {
             const n = getRandomElement(hiddenNodes)
-            if (graph[n.id].parents.length <= 1 || graph[n.id].parents.length <= 1) {
+            if (graph[n.id].parents.length <= 1 || graph[n.id].children.length <= 1) {
                 if (graph[n.id].parents.length == 1) {
                     const newInNode = graph[graph[n.id].parents[0].inNode].node
                     for (let j = 0; j < graph[n.id].children.length; j++) {
@@ -199,9 +199,9 @@ class Genome {
                         neat.addConnection(this, newInNode, newOutNode, newWeight)
                     }
                 } else if (graph[n.id].children.length == 1) {
-                    const newOutNode = graph[graph[n.id].children[0].inNode].node
+                    const newOutNode = graph[graph[n.id].children[0].outNode].node
                     for (let j = 0; j < graph[n.id].parents.length; j++) {
-                        const newInNode = graph[graph[n.id].parents[j].outNode].node
+                        const newInNode = graph[graph[n.id].parents[j].inNode].node
                         const newWeight = graph[n.id].parents[j].weight * graph[n.id].children[0].weight
                         neat.addConnection(this, newInNode, newOutNode, newWeight)
                     }
