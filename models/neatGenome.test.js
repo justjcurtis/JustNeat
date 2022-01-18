@@ -33,8 +33,8 @@ describe('neatGenome', () => {
         return genome
     }
     const getRealNeat = (genome) => {
-        const inputCount = genome.nodes.filter(n => n.type == NodeType.input)
-        const outputCount = genome.nodes.filter(n => n.type == NodeType.output)
+        const inputCount = genome.nodes.filter(n => n.type == NodeType.input).length
+        const outputCount = genome.nodes.filter(n => n.type == NodeType.output).length
         const neat = new Neat(inputCount, outputCount)
         neat.pop = [new Client(genome)]
         neat.connectionPool = {}
@@ -247,10 +247,7 @@ describe('neatGenome', () => {
     describe("simplifications", () => {
         let randomVal = 0.5
         const random = Math.random
-        beforeAll(() => {
-            global.Math.random = () => randomVal
-        })
-        afterAll(() => {
+        afterEach(() => {
             global.Math.random = random
         })
         const getMockMutationGenome = () => {
@@ -265,6 +262,7 @@ describe('neatGenome', () => {
             genome.mutateInterpose = jest.fn()
             genome.mutateWeightRandom = jest.fn()
             genome.mutateWeightShift = jest.fn()
+            genome.mutate = jest.fn()
             return genome
         }
         const getNeat = () => ({
@@ -283,27 +281,36 @@ describe('neatGenome', () => {
                 randomActivationChance: 0,
             }
         })
-        test('simplify should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
-            const genome = getMockMutationGenome()
-            const neat = getNeat(genome)
-            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
-            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
-            neat.probs.deleteConnectionChance = 1
-            genome.simplify(neat)
-            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(1)
-            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
-        })
+        describe('simplify', () => {
+            test('should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.simplify(neat)
+                expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(1)
+                neat.probs.deleteConnectionChance = 1
+                genome.simplify(neat)
+                expect(genome.mutateDeleteConnection.mock.calls.length).toBe(1)
+                expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(2)
+            })
 
-        test('simplify should call mutateDeleteNode when Math.random() < addNodeChance', () => {
-            const neat = getNeat()
-            const genome = getMockMutationGenome()
-            genome.simplify(neat)
-            expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
-            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
-            neat.probs.addNodeChance = 1
-            genome.simplify(neat)
-            expect(genome.mutateDeleteNode.mock.calls.length).toBe(1)
-            expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+            test('should call mutateDeleteNode when Math.random() < addNodeChance', () => {
+                global.Math.random = () => randomVal
+                const neat = getNeat()
+                const genome = getMockMutationGenome()
+                genome.simplify(neat)
+                expect(genome.mutateDeleteNode.mock.calls.length).toBe(0)
+                expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(1)
+                neat.probs.addNodeChance = 1
+                genome.simplify(neat)
+                expect(genome.mutateDeleteNode.mock.calls.length).toBe(1)
+                expect(genome.mutateDeleteConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(2)
+            })
         })
 
         describe('deleteConnection', () => {
@@ -417,7 +424,133 @@ describe('neatGenome', () => {
     })
 
     describe("augmentations", () => {
-        // TODO: add tests
+        let randomVal = 0.5
+        const random = Math.random
+        afterEach(() => {
+            global.Math.random = random
+        })
+        const getMockMutationGenome = () => {
+            const genome = getXorGenome()
+            genome.mutateActivation = jest.fn()
+            genome.mutateBiasRandom = jest.fn()
+            genome.mutateBiasShift = jest.fn()
+            genome.mutateConnection = jest.fn()
+            genome.mutateDeleteConnection = jest.fn()
+            genome.mutateDeleteNode = jest.fn()
+            genome.mutateDisableConnection = jest.fn()
+            genome.mutateInterpose = jest.fn()
+            genome.mutateWeightRandom = jest.fn()
+            genome.mutateWeightShift = jest.fn()
+            genome.mutate = jest.fn()
+            return genome
+        }
+        const getNeat = () => ({
+            probs: {
+                weightMutationChance: 0,
+                weightShiftChance: 0,
+                biasMutationChance: 0,
+                biasShiftChance: 0,
+                addConnectionChance: 0,
+                addRecurrentChance: 0,
+                reEnableConnectionChance: 0,
+                disableConnectionChance: 0,
+                addNodeChance: 0,
+                deleteConnectionChance: 0,
+                deleteNodeChance: 0,
+                randomActivationChance: 0,
+            }
+        })
+        describe('augment', () => {
+            test('should call mutateConnection when Math.random() < neat.probs.addConnectionChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(0)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(1)
+                neat.probs.addConnectionChance = 1
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(1)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(0)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(2)
+            })
+            test('should call mutateInterpose when Math.random() < neat.probs.addNodeChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(0)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(1)
+                neat.probs.addNodeChance = 1
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(1)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(2)
+            })
+            test('should call mutateDisableConnection when Math.random() < neat.probs.disableConnectionChance', () => {
+                global.Math.random = () => randomVal
+                const genome = getMockMutationGenome()
+                const neat = getNeat(genome)
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(0)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
+                expect(genome.mutate.mock.calls.length).toBe(1)
+                neat.probs.disableConnectionChance = 1
+                genome.augment(neat)
+                expect(genome.mutateConnection.mock.calls.length).toBe(0)
+                expect(genome.mutateInterpose.mock.calls.length).toBe(0)
+                expect(genome.mutateDisableConnection.mock.calls.length).toBe(1)
+                expect(genome.mutate.mock.calls.length).toBe(2)
+            })
+        })
+        describe('mutateConnection', () => {
+            const mutateConnectionTestData = [
+                ['recurrent', 1],
+                ['non-recurrent', 0]
+            ]
+            test.each(mutateConnectionTestData)('should add a valid connection between 2 nodes (%p)', (_, recurrentChance) => {
+                const genome = getXorGenome()
+                genome.deleteConnection('0,4')
+                genome.deleteConnection('1,3')
+                const startingConnectionCount = genome.connections.length
+                genome.buildGenomeMap()
+                genome.constructLayers()
+                const neat = getRealNeat(genome)
+                neat.probs.addRecurrentChance = recurrentChance
+                for (let i = 0; i < 100; i++) {
+                    genome.mutateConnection(neat)
+                }
+                expect(genome.connections.length > startingConnectionCount).toBe(true)
+                expect(genome.layers.length).toBe(3)
+                const seenConnections = {}
+                let hasRecurrent = false
+                for (let i = 0; i < genome.connections.length; i++) {
+                    const con = genome.connections[i]
+                    expect(seenConnections[con.id]).toBe(undefined)
+                    seenConnections[con.id] = true
+                    const inNode = genome.nodes[genome.nodeMap[con.inNode]]
+                    const outNode = genome.nodes[genome.nodeMap[con.outNode]]
+                    expect(inNode == undefined).toBe(false)
+                    expect(outNode == undefined).toBe(false)
+                    expect(inNode.layer == outNode.layer).toBe(false)
+                    if (con.recurrent) hasRecurrent = true
+                }
+                expect(hasRecurrent).toBe(recurrentChance == 1)
+            })
+        })
+        describe('mutateInterpose', () => {
+            // TODO: add tests
+        })
+        describe('mutateDisableConnection', () => {
+            // TODO: add tests
+        })
     })
     describe("mutations", () => {
         // TODO: add tests
