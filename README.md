@@ -18,7 +18,6 @@ The `Neat` class will then be available for you to use in your javscript files v
 
 ## Todo
 -  add unit tests
-    - neatGenome
     - client
     - neat
 
