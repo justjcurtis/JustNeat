@@ -741,10 +741,10 @@ describe('neatGenome', () => {
                         if (preBiases[j] != postBiases[j]) {
                             shiftCount++
                             const diff = Math.abs(preBiases[j] - postBiases[j])
-                            expect(diff <= 0.3).toBe(true)
+                            expect(diff <= Math.abs(0.3 * preBiases[j])).toBe(true)
                         }
                     }
-                    expect(shiftCount).toBe(1)
+                    expect(shiftCount <= 1).toBe(true)
                 }
             })
         })
@@ -768,7 +768,7 @@ describe('neatGenome', () => {
 
         })
         describe('mutateWeightShift', () => {
-            test('should "shift" random connections weight by random amnt, within shift strength amnt', () => {
+            test('should "shift" random connections weight by random amnt, within shift strength amnt proportional to current value', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < 100; i++) {
                     const preWeights = genome.connections.map(c => c.weight)
@@ -779,10 +779,10 @@ describe('neatGenome', () => {
                         if (preWeights[j] != postWeights[j]) {
                             shiftCount++
                             const diff = Math.abs(preWeights[j] - postWeights[j])
-                            expect(diff <= 0.3).toBe(true)
+                            expect(diff <= Math.abs(0.3 * preWeights[j])).toBe(true)
                         }
                     }
-                    expect(shiftCount).toBe(1)
+                    expect(shiftCount <= 1).toBe(true)
                 }
             })
         })

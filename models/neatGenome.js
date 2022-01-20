@@ -228,7 +228,7 @@ class Genome {
 
     mutateBiasShift(x = 0.3) {
         const n = getRandomElement(this.nodes)
-        n.bias += randomStd0() * x
+        n.bias += (randomStd0() * x) * n.bias
         this.g = null
     }
 
@@ -262,7 +262,7 @@ class Genome {
 
     mutateWeightShift(x = 0.3) {
         const con = getRandomElement(this.connections)
-        con.weight += randomStd0() * x
+        con.weight += (randomStd0() * x) * con.weight
         this.g = null
     }
 
