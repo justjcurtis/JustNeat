@@ -18,4 +18,4 @@ const xorFitness = (client) => {
     return -mse(results)
 }
 
-nn.trainFn(xorFitness, 0)
+nn.trainFn(xorFitness, 0, 0.01, true)
