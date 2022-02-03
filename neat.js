@@ -107,7 +107,7 @@ class Neat {
         const data = JSON.parse(json)
         const opts = {
             maxPop: data.maxPop,
-            recurrent: data.hyper.addRecurrentChance == 0,
+            recurrent: data.probs.addRecurrentChance > 0,
             outputActivation: data.outputActivation,
             hiddenActivation: data.hiddenActivation,
             allowedActivations: data.allowedActivations,
