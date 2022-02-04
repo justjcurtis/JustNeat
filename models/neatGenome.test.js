@@ -174,7 +174,7 @@ describe('neatGenome', () => {
             const postCheck = genome.getLongestPathToInput(nodeId, graph)
             expect(postCheck).toBe(post)
         })
-        test('adding shorter connection to input from a node doesn\'t change the longest path', () => {
+        it('adding shorter connection to input from a node doesn\'t change the longest path', () => {
             const genome = getXorGenome()
             let graph = genome.getGraph()
             const pre = genome.getLongestPathToInput(2, graph)
@@ -184,7 +184,7 @@ describe('neatGenome', () => {
             const post = genome.getLongestPathToInput(2, graph)
             expect(pre).toBe(post)
         })
-        test('adding longer recurrent connection to input from a node doesn\'t change the longest path', () => {
+        it('adding longer recurrent connection to input from a node doesn\'t change the longest path', () => {
             const genome = getXorGenome()
             let graph = genome.getGraph()
             const pre = genome.getLongestPathToInput(2, graph)
@@ -201,7 +201,7 @@ describe('neatGenome', () => {
         })
     })
     describe("constructLayers", () => {
-        test('should construct layers as expected', () => {
+        it('should construct layers as expected', () => {
             const genome = getXorGenome()
             const layers = getLayers(genome.nodes)
             genome.layers = []
@@ -213,7 +213,7 @@ describe('neatGenome', () => {
                 }
             }
         })
-        test('should set recurrent connections correctly', () => {
+        it('should set recurrent connections correctly', () => {
             const genome = getXorGenome()
             genome.layers = []
             for (let i = 0; i < genome.connections.length; i++) {
@@ -229,7 +229,7 @@ describe('neatGenome', () => {
             }
         })
 
-        test('should disable connections on same layer', () => {
+        it('should disable connections on same layer', () => {
             const genome = getXorGenome()
             genome.connections.push(new Connection(3, 4, 10, 7, false, true))
             genome.layers = []
@@ -283,7 +283,7 @@ describe('neatGenome', () => {
             }
         })
         describe('simplify', () => {
-            test('should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
+            it('should call mutateDeleteConnection when Math.random() < disableConnectionChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -298,7 +298,7 @@ describe('neatGenome', () => {
                 expect(genome.mutate.mock.calls.length).toBe(2)
             })
 
-            test('should call mutateDeleteNode when Math.random() < addNodeChance', () => {
+            it('should call mutateDeleteNode when Math.random() < addNodeChance', () => {
                 global.Math.random = () => randomVal
                 const neat = getNeat()
                 const genome = getMockMutationGenome()
@@ -315,7 +315,7 @@ describe('neatGenome', () => {
         })
 
         describe('deleteConnection', () => {
-            test('should delete the connection with the same id & rebuild maps', () => {
+            it('should delete the connection with the same id & rebuild maps', () => {
                 const genome = getXorGenome()
                 const conId = genome.connections[4].id
                 genome.deleteConnection(conId)
@@ -332,7 +332,7 @@ describe('neatGenome', () => {
         })
 
         describe('deleteNode', () => {
-            test('should delete the node with the same id & rebuild maps', () => {
+            it('should delete the node with the same id & rebuild maps', () => {
                 const genome = getXorGenome()
                 const nodeId = genome.nodes[4].id
                 genome.deleteNode(nodeId)
@@ -349,7 +349,7 @@ describe('neatGenome', () => {
         })
 
         describe('mutateDeleteConnection', () => {
-            test('mutateDeleteConnection should delete the connection and hidden nodes with no other connections on the same side', () => {
+            it('mutateDeleteConnection should delete the connection and hidden nodes with no other connections on the same side', () => {
                 const genome = getXorGenome()
                 let i = 0
                 let limit = genome.connections.length
@@ -461,7 +461,7 @@ describe('neatGenome', () => {
             }
         })
         describe('augment', () => {
-            test('should call mutateConnection when Math.random() < neat.probs.addConnectionChance', () => {
+            it('should call mutateConnection when Math.random() < neat.probs.addConnectionChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -477,7 +477,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
                 expect(genome.mutate.mock.calls.length).toBe(2)
             })
-            test('should call mutateInterpose when Math.random() < neat.probs.addNodeChance', () => {
+            it('should call mutateInterpose when Math.random() < neat.probs.addNodeChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -493,7 +493,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateDisableConnection.mock.calls.length).toBe(0)
                 expect(genome.mutate.mock.calls.length).toBe(2)
             })
-            test('should call mutateDisableConnection when Math.random() < neat.probs.disableConnectionChance', () => {
+            it('should call mutateDisableConnection when Math.random() < neat.probs.disableConnectionChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -547,7 +547,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateInterpose', () => {
-            test('should add a node along a connection and update genome correctly', () => {
+            it('should add a node along a connection and update genome correctly', () => {
                 const genome = getXorGenome()
                 const neat = getRealNeat(genome)
                 for (let i = 0; i < 10; i++) {
@@ -570,7 +570,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateDisableConnection', () => {
-            test('should disable random connection', () => {
+            it('should disable random connection', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < genome.connections.length; i++) {
                     const preDisabled = genome.connections.filter(c => !c.enabled).length
@@ -624,7 +624,7 @@ describe('neatGenome', () => {
             }
         })
         describe('mutate', () => {
-            test('should call mutateActivation when Math.random() < randomActivationChance', () => {
+            it('should call mutateActivation when Math.random() < randomActivationChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -642,7 +642,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
                 expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
             })
-            test('should call mutateBiasShift when Math.random() < biasMutationChance & biasShiftChance', () => {
+            it('should call mutateBiasShift when Math.random() < biasMutationChance & biasShiftChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -661,7 +661,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
                 expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
             })
-            test('should call mutateBiasShift when Math.random() < biasMutationChance & Math.random()> biasShiftChance', () => {
+            it('should call mutateBiasShift when Math.random() < biasMutationChance & Math.random()> biasShiftChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -680,7 +680,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateWeightShift.mock.calls.length).toBe(0)
                 expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
             })
-            test('should call mutateBiasShift when Math.random() < weightMutationChance & weightShiftChance', () => {
+            it('should call mutateBiasShift when Math.random() < weightMutationChance & weightShiftChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -699,7 +699,7 @@ describe('neatGenome', () => {
                 expect(genome.mutateWeightShift.mock.calls.length).toBe(1)
                 expect(genome.mutateWeightRandom.mock.calls.length).toBe(0)
             })
-            test('should call mutateBiasShift when Math.random() < weightMutationChance & Math.random()> weightShiftChance', () => {
+            it('should call mutateBiasShift when Math.random() < weightMutationChance & Math.random()> weightShiftChance', () => {
                 global.Math.random = () => randomVal
                 const genome = getMockMutationGenome()
                 const neat = getNeat(genome)
@@ -720,7 +720,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateActivation', () => {
-            test('should mutate a random nodes activation function to a random allowed activation function', () => {
+            it('should mutate a random nodes activation function to a random allowed activation function', () => {
                 const genome = getXorGenome()
                 const allowed = ['sig']
                 const preMutatedNodesCount = genome.nodes.filter(n => n.activation == aNm['sig']).length
@@ -730,7 +730,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateBiasShift', () => {
-            test('should "shift" random nodes bias by random amnt, within shift strength amnt', () => {
+            it('should "shift" random nodes bias by random amnt, within shift strength amnt', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < 100; i++) {
                     const preBiases = genome.nodes.map(n => n.bias)
@@ -749,7 +749,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateBiasRandom', () => {
-            test('should set random nodes bias to random value within min & max', () => {
+            it('should set random nodes bias to random value within min & max', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < 100; i++) {
                     const preBiases = genome.nodes.map(n => n.bias)
@@ -768,7 +768,7 @@ describe('neatGenome', () => {
 
         })
         describe('mutateWeightShift', () => {
-            test('should "shift" random connections weight by random amnt, within shift strength amnt proportional to current value', () => {
+            it('should "shift" random connections weight by random amnt, within shift strength amnt proportional to current value', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < 100; i++) {
                     const preWeights = genome.connections.map(c => c.weight)
@@ -787,7 +787,7 @@ describe('neatGenome', () => {
             })
         })
         describe('mutateWeightRandom', () => {
-            test('should set random connections weight by random amnt within min & max', () => {
+            it('should set random connections weight by random amnt within min & max', () => {
                 const genome = getXorGenome()
                 for (let i = 0; i < 100; i++) {
                     const preWeights = genome.connections.map(c => c.weight)
@@ -806,7 +806,7 @@ describe('neatGenome', () => {
         })
     })
     describe("copy", () => {
-        test('should return a de-referenced replica of the genome', () => {
+        it('should return a de-referenced replica of the genome', () => {
             const genome = getXorGenome()
             genome.species = 5
             const copy = genome.copy()
@@ -819,7 +819,7 @@ describe('neatGenome', () => {
         })
     })
     describe("toJson", () => {
-        test('should return json copy of all genome nodes & connections + species', () => {
+        it('should return json copy of all genome nodes & connections + species', () => {
             const genome = getXorGenome()
             genome.species = 5
             const data = JSON.parse(genome.toJson())
@@ -829,7 +829,7 @@ describe('neatGenome', () => {
         })
     })
     describe("FromJson", () => {
-        test('should return a new Genome with all properties from json', () => {
+        it('should return a new Genome with all properties from json', () => {
             const genome = getXorGenome()
             genome.species = 5
             const newGenome = Genome.FromJson(genome.toJson())

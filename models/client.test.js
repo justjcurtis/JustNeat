@@ -47,7 +47,7 @@ describe('client', () => {
         return new Genome(nodes, connections)
     }
     describe('ctor', () => {
-        test('should return client with default score genomeCost & passed genome', () => {
+        it('should return client with default score genomeCost & passed genome', () => {
             const genome = getXorGenome()
             const client = new Client(genome)
             expect(client.score).toBe(-Infinity)
@@ -55,7 +55,7 @@ describe('client', () => {
         })
     })
     describe('getInputValue', () => {
-        test('should get correct input value for node from graph', () => {
+        it('should get correct input value for node from graph', () => {
             const genome = getXorGenome()
             const graph = genome.getGraph()
             graph[0].value = 1
@@ -106,7 +106,7 @@ describe('client', () => {
         })
     })
     describe('getOutput', () => {
-        test('should get output array from give graph', () => {
+        it('should get output array from give graph', () => {
             const genome = getXorGenome()
             genome.nodes.push(new Node(5, NodeType.output, 10))
             genome.buildGenomeMap()

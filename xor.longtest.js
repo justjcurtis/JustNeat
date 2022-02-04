@@ -1,6 +1,6 @@
 const Neat = require('./neat')
 describe('solve xor', () => {
-    test('should be able to solve xor using trainFn', () => {
+    it('should be able to solve xor using trainFn', () => {
         const neat = new Neat(2, 1, { maxPop: 2000 })
         const xorFitness = (client) => {
             const result = [
@@ -22,7 +22,7 @@ describe('solve xor', () => {
         expect(Math.round(client.predict([0, 0]))).toBe(0)
         expect(gen < 1000).toBe(true)
     })
-    test('should be able to solve xor using trainData', () => {
+    it('should be able to solve xor using trainData', () => {
         const neat = new Neat(2, 1, { maxPop: 2000 })
         const trainingData = [
             [

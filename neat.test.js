@@ -3,7 +3,7 @@ const Neat = require("./neat")
 
 describe('neat', () => {
     describe('ctor', () => {
-        test('should return new neat instance with specified inputs and outputs', () => {
+        it('should return new neat instance with specified inputs and outputs', () => {
             const neat = new Neat(3, 2)
             for (let i = 0; i < neat.pop.length; i++) {
                 expect(neat.pop[i].genome.nodes.filter(n => n.type == NodeType.input).length == 3)
@@ -11,7 +11,7 @@ describe('neat', () => {
             }
             expect(neat.probs.addRecurrentChance).toBe(0)
         })
-        test('should return new neat instance with specified opts', () => {
+        it('should return new neat instance with specified opts', () => {
             const neat = new Neat(3, 2, {
                 maxPop: 2341,
                 recurrent: true,
@@ -29,7 +29,7 @@ describe('neat', () => {
         })
     })
     describe('FromJson', () => {
-        test('should return new neat replica of given json', () => {
+        it('should return new neat replica of given json', () => {
             const expected = new Neat(3, 2, {
                 maxPop: 241,
                 recurrent: true,
@@ -69,7 +69,7 @@ describe('neat', () => {
         })
     })
     describe('toJson', () => {
-        test('should return json representation with all neat data', () => {
+        it('should return json representation with all neat data', () => {
             const neat = new Neat(3, 2, {
                 maxPop: 241,
                 recurrent: true,
