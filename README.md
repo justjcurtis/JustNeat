@@ -20,6 +20,15 @@ The `Neat` class will then be available for you to use in your javscript files v
 -  add unit tests
     - neat
 
+- features
+    - typescript support
+    - multi-threading helpers for common training uses cases
+    - more loss functions
+
+- refactor
+    - create config classes for neat.opts
+    - name each loss & activation function
+
 - add documentation
     - neatNode
     - neatConnection
