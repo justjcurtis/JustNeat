@@ -1,6 +1,6 @@
 {
     "name": "justneat",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "js neat library",
     "main": "index.js",
     "scripts": {
