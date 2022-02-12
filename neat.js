@@ -553,7 +553,7 @@ class Neat {
         return minLoss
     }
 
-    trainData(trainingData, targetLoss = 0.01, log = false, lossFnOverride = undefined, onBest = undefined) {
+    trainData(trainingData, targetLoss = 0.01, log = false, onBest = undefined, lossFnOverride = undefined) {
         if (lossFnOverride == undefined) lossFnOverride = lFn[lNm[this.lossFn]]
         let best = Infinity;
         let gen = 0;
