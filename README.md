@@ -26,7 +26,6 @@ The `Neat` class will then be available for you to use in your javscript files v
     - more loss functions
 
 - refactor
-    - create config classes for neat.opts
     - name each loss & activation function
 
 - add documentation
