@@ -512,13 +512,14 @@ class Neat {
         return best
     }
 
-    trainFn(getScore, goal, targetLoss = 0.01, log = false) {
+    trainFn(getScore, goal, targetLoss = 0.01, log = false, onBest = undefined) {
         let best = -Infinity
         let gen = 0
         while (true) {
             const score = this.trainFnStep(getScore, best)
             if (score > best) {
                 best = score
+                if (onBest != undefined) onBest(this, best, gen)
                 if (log) {
                     const table = {}
                     table[gen] = { "Best score": best }
@@ -552,7 +553,7 @@ class Neat {
         return minLoss
     }
 
-    trainData(trainingData, targetLoss = 0.01, log = false, lossFnOverride = undefined) {
+    trainData(trainingData, targetLoss = 0.01, log = false, lossFnOverride = undefined, onBest = undefined) {
         if (lossFnOverride == undefined) lossFnOverride = lFn[lNm[this.lossFn]]
         let best = Infinity;
         let gen = 0;
@@ -560,6 +561,7 @@ class Neat {
             const loss = this.trainDataStep(trainingData, lossFnOverride)
             if (loss < best) {
                 best = loss
+                if (onBest != undefined) onBest(this, best, gen)
                 if (log) {
                     const table = {}
                     table[gen] = { "Loss": best }
